@@ -1,0 +1,21 @@
+{
+  "name": "EchoLog",
+  "short_name": "EchoLog",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "description": "Your personal homelab journal",
+  "icons": [
+    {
+      "src": "/static/echolog.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/echolog.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
