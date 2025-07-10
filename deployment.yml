@@ -21,13 +21,13 @@ spec:
             - containerPort: 5000
               name: "echolog"
           env:
-            - name: DB_HOST
+            - name: MYSQL_HOST
               value: "10.10.2.27"
-            - name: DB_USER
+            - name: MYSQL_USER
               value: "echolog"
-            - name: DB_PASSWORD
+            - name: MYSQL_PASSWORD
               value: "gHH0&nGWK!@8Y5"
-            - name: DB_NAME
+            - name: MYSQL_DATABASE
               value: "echolog"
             - name: SECRET_KEY
               value: "bgSNcrA0gZiRX9LbZmminf2LItEXeo"
