@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: echolog
+  namespace: echolog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echolog
+  template:
+    metadata:
+      labels:
+        app: echolog
+    spec:
+      containers:
+        - name: echolog
+          image: docker.jdbnet.co.uk/internal/echolog:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5000
+              name: "echolog"
+          env:
+            - name: DB_HOST
+              value: "10.10.2.27"
+            - name: DB_USER
+              value: "echolog"
+            - name: DB_PASSWORD
+              value: "gHH0&nGWK!@8Y5"
+            - name: DB_NAME
+              value: "echolog"
+            - name: SECRET_KEY
+              value: "bgSNcrA0gZiRX9LbZmminf2LItEXeo"
+            - name: LOGIN_ENABLED
+              value: "true"
+            - name: LOGIN_USERNAME
+              value: "jamie"
+            - name: LOGIN_PASSWORD
+              value: "X2pl5g%AE5m$xr"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echolog-ingress-service
+  namespace: echolog
+spec:
+  selector:
+    app: echolog
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: echolog-ingress
+  namespace: echolog
+spec:
+  rules:
+  - host: echolog.jdb143.uk
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: echolog-ingress-service
+            port:
+              number: 80
