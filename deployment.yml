@@ -31,6 +31,8 @@ spec:
               value: "echolog"
             - name: SECRET_KEY
               value: "bgSNcrA0gZiRX9LbZmminf2LItEXeo"
+            - name: TZ
+              value: "Europe/London"
             - name: LOGIN_ENABLED
               value: "true"
             - name: LOGIN_USERNAME

@@ -1,4 +1,5 @@
 import os
+import pytz
 from flask import Flask, render_template, request, redirect, url_for, session
 from datetime import datetime
 from datetime import date as datedate
@@ -9,6 +10,9 @@ from dotenv import load_dotenv
 app = Flask(__name__)
 
 load_dotenv()
+
+TIMEZONE = os.getenv('TZ', 'UTC')
+tz = pytz.timezone(TIMEZONE)
 
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'defaultsecret')
 app.config['LOGIN_ENABLED'] = os.getenv('LOGIN_ENABLED', 'false').lower() == 'true'
@@ -52,13 +56,13 @@ def index():
     conn.close()
     has_prev = page > 1
     has_next = offset + per_page < total
-    today = datedate.today().isoformat()
-    now = dt.now()
+    today = datetime.now(tz).date().isoformat()
+    now = datetime.now(tz)
     return render_template('index.html', entries=entries, today=today, page=page, has_prev=has_prev, has_next=has_next, now=now)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
-    date = request.form.get('date', datetime.today().strftime('%Y-%m-%d'))
+    date = request.form.get('date', datetime.now(tz).strftime('%Y-%m-%d'))
     content = request.form.get('content', '')
     if content.strip():
         conn = get_db_connection()
@@ -116,7 +120,6 @@ def require_login():
     if app.config['LOGIN_ENABLED'] and not session.get('logged_in') and request.endpoint not in ['login', 'static']:
         return redirect(url_for('login'))
 
-# Edit entry route
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
 def edit_entry(entry_id):
     conn = get_db_connection()
@@ -138,7 +141,6 @@ def edit_entry(entry_id):
             return redirect(url_for('index'))
         return render_template('edit.html', entry=entry)
 
-# Edit entry via modal
 @app.route('/edit_modal', methods=['POST'])
 def edit_entry_modal():
     entry_id = request.form.get('id')
@@ -153,7 +155,6 @@ def edit_entry_modal():
         conn.close()
     return redirect(url_for('index'))
 
-# Delete entry route
 @app.route('/delete/<int:entry_id>', methods=['POST'])
 def delete_entry(entry_id):
     conn = get_db_connection()
