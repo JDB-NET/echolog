@@ -19,3 +19,17 @@ EchoLog is a simple, modern homelab journal web app. It lets you document what y
 
 ## Docs
 For more information, see the [Docs](https://echolog.jdbnet.co.uk).
+
+## Environment Variables
+
+```
+MYSQL_HOST=10.10.2.27
+MYSQL_USER=echolog
+MYSQL_PASSWORD=gHH0&nGWK!@8Y5
+MYSQL_DATABASE=echolog
+SECRET_KEY=bgSNcrA0gZiRX9LbZmminf2LItEXeo
+TZ=Europe/London
+LOGIN_ENABLED=true
+LOGIN_USERNAME=jamie
+LOGIN_PASSWORD=jamieB223
+```

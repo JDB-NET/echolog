@@ -92,7 +92,12 @@ def search():
     entries = cursor.fetchall()
     cursor.close()
     conn.close()
-    return render_template('index.html', entries=entries)
+    today = datetime.now(tz).date().isoformat()
+    now = datetime.now(tz)
+    page = 1
+    has_prev = False
+    has_next = False
+    return render_template('index.html', entries=entries, today=today, now=now, page=page, has_prev=has_prev, has_next=has_next)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
