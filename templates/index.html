@@ -38,25 +38,39 @@
         <form action="/add" method="POST" class="mb-8 bg-gray-800/80 rounded-xl shadow-lg p-6 border border-gray-700">
             <div class="mb-4">
                 <label for="date" class="block text-xs font-semibold text-gray-400 mb-1">Date</label>
-                <input type="date" id="date" name="date" class="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500" required value="{{ today }}">
+                <input type="date" id="date" name="date" class="w-full p-2 bg-gray-900 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500" required value="{{ today }}" onchange="onDateChange()">
             </div>
             <div class="mb-4">
                 <label for="content" class="block text-xs font-semibold text-gray-400 mb-1">Journal Entry</label>
-                <textarea id="content" name="content" rows="4" class="w-full p-3 bg-gray-900 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 resize-vertical" placeholder="What did you do today?" required></textarea>
+                <textarea id="content" name="content" rows="4" class="w-full p-3 bg-gray-900 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 resize-vertical" placeholder="What did you do today?" required>{{ todays_entry.content if todays_entry else '' }}</textarea>
             </div>
-            <button type="submit" class="w-full py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white font-bold rounded shadow hover:scale-105 transition">Add Entry</button>
+            <div class="flex justify-center">
+                <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white font-bold rounded shadow hover:scale-105 transition flex items-center gap-2 hover:cursor-pointer">
+                    <i class="fas fa-plus"></i>
+                    Add Entry
+                </button>
+            </div>
         </form>
 
         <form action="/search" method="GET" class="mb-8 flex flex-col gap-4 items-stretch md:flex-row md:items-end">
             <div class="flex-1">
                 <label for="query" class="block text-xs font-semibold text-gray-400 mb-1">Search</label>
-                <input type="text" id="query" name="query" class="w-full p-2 bg-gray-900 border border-gray-700 rounded" placeholder="Search by keyword...">
+                <input type="text" id="query" name="query" class="w-full p-2 bg-gray-900 border border-gray-700 rounded" placeholder="Search by keyword..." value="{{ request.args.get('query', '') }}">
             </div>
             <div class="flex-1">
                 <label for="date_search" class="block text-xs font-semibold text-gray-400 mb-1">Date</label>
-                <input type="date" id="date_search" name="date" class="w-full p-2 bg-gray-900 border border-gray-700 rounded">
+                <input type="date" id="date_search" name="date" class="w-full p-2 bg-gray-900 border border-gray-700 rounded" value="{{ request.args.get('date', '') }}">
             </div>
-            <button type="submit" class="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold rounded shadow hover:scale-105 transition w-full md:w-auto">Filter</button>
+            <div class="flex flex-row gap-2 items-end justify-center md:justify-end">
+                <button type="submit" class="w-12 h-12 flex items-center justify-center bg-gradient-to-r from-blue-500 to-pink-500 text-white rounded-full shadow hover:scale-105 transition text-xl md:w-12 md:h-12 hover:cursor-pointer">
+                    <i class="fas fa-search"></i>
+                </button>
+                {% if request.args.get('query') or request.args.get('date') %}
+                <a href="/" class="w-12 h-12 flex items-center justify-center bg-gradient-to-r from-blue-500 to-pink-500 text-white rounded-full shadow hover:scale-105 transition text-xl md:w-12 md:h-12 hover:cursor-pointer" title="Clear search">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
         </form>
 
         <section>
@@ -67,11 +81,26 @@
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-xs text-gray-400 font-mono">{{ entry.date }}</span>
                         <div class="flex gap-2">
-                            <button type="button" class="text-blue-400 hover:text-blue-200" title="Edit" onclick='openEditModal("{{ entry.id|escape }}", "{{ entry.date|escape }}", {{ entry.content|tojson|safe }})'><i class="fas fa-edit"></i></button>
-                            <button type="button" class="text-pink-400 hover:text-pink-200" title="Delete" onclick='openDeleteModal("{{ entry.id|escape }}")'><i class="fas fa-trash-alt"></i></button>
+                            <button type="button" class="text-blue-400 hover:text-blue-200 hover:cursor-pointer" title="Edit" onclick='openEditModal("{{ entry.id|escape }}", "{{ entry.date|escape }}", {{ entry.content|tojson|safe }})'><i class="fas fa-edit"></i></button>
+                            <button type="button" class="text-pink-400 hover:text-pink-200 hover:cursor-pointer" title="Delete" onclick='openDeleteModal("{{ entry.id|escape }}")'><i class="fas fa-trash-alt"></i></button>
                         </div>
                     </div>
-                    <pre class="whitespace-pre-wrap break-words text-base text-gray-100 font-sans">{{ entry.content }}</pre>
+                    <ul class="list-none m-0 p-0">
+                        {% for line in entry.content.split('\n') if line.strip() %}
+                        <li class="flex items-start text-base text-gray-100 font-sans mb-1">
+                            <svg class="w-5 h-5 mr-2 flex-shrink-0 bg-gradient-to-r from-blue-400 to-pink-400 text-transparent bg-clip-text mt-[2px]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 20 20">
+                                <defs>
+                                    <linearGradient id="arrow-gradient" x1="0" y1="0" x2="20" y2="0" gradientUnits="userSpaceOnUse">
+                                        <stop stop-color="#60a5fa" />
+                                        <stop offset="1" stop-color="#f472b6" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M5 10h10M13 6l4 4-4 4" stroke="url(#arrow-gradient)" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>{{ line }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </li>
                 {% else %}
                 <li class="text-gray-500 text-center">No entries found.</li>
@@ -81,7 +110,7 @@
             <!-- Edit Modal -->
             <div id="edit-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 hidden">
                 <div class="bg-gray-900 rounded-xl shadow-2xl p-8 w-full max-w-lg border border-gray-700 relative">
-                    <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-pink-400 text-2xl"><i class="fas fa-times"></i></button>
+                    <button onclick="closeEditModal()" class="absolute top-4 right-4 text-gray-400 hover:text-pink-400 text-2xl hover:cursor-pointer"><i class="fas fa-times"></i></button>
                     <h2 class="text-2xl font-bold mb-6 text-pink-400">Edit Entry</h2>
                     <form id="edit-form" action="/edit_modal" method="POST" class="space-y-4">
                         <input type="hidden" id="edit-id" name="id">
@@ -94,8 +123,8 @@
                             <textarea id="edit-content" name="content" rows="4" class="w-full p-3 bg-gray-800 border border-gray-700 rounded focus:ring-2 focus:ring-blue-500 resize-vertical" required></textarea>
                         </div>
                         <div class="flex gap-4">
-                            <button type="submit" class="flex-1 py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white font-bold rounded shadow hover:scale-105 transition">Save Changes</button>
-                            <button type="button" onclick="closeEditModal()" class="flex-1 py-2 bg-gray-700 text-white font-bold rounded shadow hover:bg-gray-600 transition">Cancel</button>
+                            <button type="submit" class="flex-1 py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white font-bold rounded shadow hover:scale-105 transition hover:cursor-pointer">Save Changes</button>
+                            <button type="button" onclick="closeEditModal()" class="flex-1 py-2 bg-gray-700 text-white font-bold rounded shadow hover:bg-gray-600 transition hover:cursor-pointer">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -104,13 +133,13 @@
             <!-- Delete Modal -->
             <div id="delete-modal" class="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 hidden">
                 <div class="bg-gray-900 rounded-xl shadow-2xl p-8 w-full max-w-md border border-gray-700 relative">
-                    <button onclick="closeDeleteModal()" class="absolute top-4 right-4 text-gray-400 hover:text-pink-400 text-2xl"><i class="fas fa-times"></i></button>
+                    <button onclick="closeDeleteModal()" class="absolute top-4 right-4 text-gray-400 hover:text-pink-400 text-2xl hover:cursor-pointer"><i class="fas fa-times"></i></button>
                     <h2 class="text-2xl font-bold mb-6 text-pink-400">Delete Entry</h2>
                     <p class="mb-6 text-gray-300">Are you sure you want to delete this entry? This action cannot be undone.</p>
                     <form id="delete-form" method="POST">
                         <div class="flex gap-4">
-                            <button type="submit" class="flex-1 py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white font-bold rounded shadow hover:scale-105 transition">Delete</button>
-                            <button type="button" onclick="closeDeleteModal()" class="flex-1 py-2 bg-gray-700 text-white font-bold rounded shadow hover:bg-gray-600 transition">Cancel</button>
+                            <button type="submit" class="flex-1 py-2 bg-gradient-to-r from-blue-500 to-pink-500 text-white font-bold rounded shadow hover:scale-105 transition hover:cursor-pointer">Delete</button>
+                            <button type="button" onclick="closeDeleteModal()" class="flex-1 py-2 bg-gray-700 text-white font-bold rounded shadow hover:bg-gray-600 transition hover:cursor-pointer">Cancel</button>
                         </div>
                     </form>
                 </div>
@@ -118,12 +147,12 @@
 
             <div class="mt-8 flex justify-between">
                 {% if has_prev %}
-                <a href="?page={{ page - 1 }}" class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">Previous</a>
+                <a href="?page={{ page - 1 }}" class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 hover:cursor-pointer">Previous</a>
                 {% else %}
                 <span></span>
                 {% endif %}
                 {% if has_next %}
-                <a href="?page={{ page + 1 }}" class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">Next</a>
+                <a href="?page={{ page + 1 }}" class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600 hover:cursor-pointer">Next</a>
                 {% endif %}
             </div>
         </section>
@@ -133,6 +162,8 @@
         <span>JDB-NET &copy; {{ now.year }}</span>
         &middot;
         <a href="https://echolog.jdbnet.co.uk" target="_blank" rel="noopener" class="text-gray-500 hover:text-pink-400 hover:underline ml-1">Docs</a>
+        &middot;
+        <a href="mailto:jamie@jdbnet.co.uk?subject=EchoLog" class="text-gray-500 hover:text-pink-400 hover:underline ml-1">Support</a>
     </footer>
 
     <script>
@@ -160,6 +191,15 @@
             closeDeleteModal();
         }
     });
+    function onDateChange() {
+        const dateInput = document.getElementById('date');
+        const contentInput = document.getElementById('content');
+        fetch(`/entry_for_date?date=${encodeURIComponent(dateInput.value)}`)
+            .then(response => response.json())
+            .then(data => {
+                contentInput.value = data.content || '';
+            });
+    }
     </script>
 </body>
 </html>

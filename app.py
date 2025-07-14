@@ -1,9 +1,7 @@
 import os
 import pytz
-from flask import Flask, render_template, request, redirect, url_for, session
-from datetime import datetime
-from datetime import date as datedate
-from datetime import datetime as dt
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from datetime import datetime, date as datedate, datetime as dt
 import mysql.connector
 from dotenv import load_dotenv
 
@@ -52,13 +50,15 @@ def index():
     entries = cursor.fetchall()
     cursor.execute("SELECT FOUND_ROWS() as total")
     total = cursor.fetchone()['total']
+    today = datetime.now(tz).date().isoformat()
+    cursor.execute("SELECT * FROM journal_entry WHERE date = %s", (today,))
+    todays_entry = cursor.fetchone()
     cursor.close()
     conn.close()
     has_prev = page > 1
     has_next = offset + per_page < total
-    today = datetime.now(tz).date().isoformat()
     now = datetime.now(tz)
-    return render_template('index.html', entries=entries, today=today, page=page, has_prev=has_prev, has_next=has_next, now=now)
+    return render_template('index.html', entries=entries, today=today, page=page, has_prev=has_prev, has_next=has_next, now=now, todays_entry=todays_entry)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
@@ -67,11 +67,29 @@ def add_entry():
     if content.strip():
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO journal_entry (date, content) VALUES (%s, %s)", (date, content))
+        cursor.execute("SELECT id FROM journal_entry WHERE date = %s", (date,))
+        existing = cursor.fetchone()
+        if existing:
+            cursor.execute("UPDATE journal_entry SET content = %s WHERE date = %s", (content, date))
+        else:
+            cursor.execute("INSERT INTO journal_entry (date, content) VALUES (%s, %s)", (date, content))
         conn.commit()
         cursor.close()
         conn.close()
     return redirect(url_for('index'))
+
+@app.route('/entry_for_date')
+def entry_for_date():
+    date = request.args.get('date')
+    if not date:
+        return jsonify({'content': ''})
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT content FROM journal_entry WHERE date = %s", (date,))
+    entry = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify({'content': entry['content'] if entry else ''})
 
 @app.route('/search', methods=['GET'])
 def search():
