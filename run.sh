@@ -4,4 +4,4 @@ echo "Generating CSS..."
 ./tailwindcss -i ./static/input.css -o ./static/output.css --content "./templates/*.html" --minify
 
 echo "Starting app..."
-python3 app.py
+gunicorn --workers 2 --bind 0.0.0.0:5000 app:app --log-level warning

@@ -1,5 +1,6 @@
 import os
 import pytz
+import logging
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from datetime import datetime, date as datedate, datetime as dt
 import mysql.connector
@@ -21,6 +22,8 @@ mysql_config = {
     'host': os.getenv('MYSQL_HOST', 'localhost'),
     'database': os.getenv('MYSQL_DATABASE', 'echolog')
 }
+
+logging.basicConfig(level=logging.INFO, format='[%(asctime)s] %(levelname)s in %(module)s: %(message)s')
 
 def get_db_connection():
     return mysql.connector.connect(**mysql_config)
@@ -189,6 +192,4 @@ def delete_entry(entry_id):
     return redirect(url_for('index'))
 
 init_db()
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+logging.info('EchoLog started up successfully.')

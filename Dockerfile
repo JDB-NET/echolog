@@ -12,4 +12,4 @@ RUN pip install -r requirements.txt \
     && ./tailwindcss -i ./static/input.css -o ./static/output.css --content "./templates/*.html" --minify \
     && rm tailwindcss
 EXPOSE 5000
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:5000", "app:app", "--log-level", "warning"]

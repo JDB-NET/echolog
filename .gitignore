@@ -1,3 +1,4 @@
 tailwindcss
 static/output.css
 .env
+__pycache__
