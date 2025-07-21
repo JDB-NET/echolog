@@ -42,6 +42,40 @@ def init_db():
     cursor.close()
     conn.close()
 
+def calculate_streak():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT date FROM journal_entry ORDER BY date DESC")
+    dates = [row[0] for row in cursor.fetchall()]
+    cursor.close()
+    conn.close()
+    if not dates:
+        return 0
+    streak = 0
+    today = datetime.now(tz).date()
+    from datetime import timedelta
+    for i, entry_date in enumerate(dates):
+        # entry_date is a date object or string, ensure date object
+        if isinstance(entry_date, str):
+            entry_date = dt.strptime(entry_date, "%Y-%m-%d").date()
+        if i == 0:
+            # First entry: must be today or yesterday to start streak
+            if entry_date == today:
+                streak = 1
+            elif entry_date == today - timedelta(days=1):
+                streak = 1
+                today = entry_date
+            else:
+                break
+        else:
+            expected = today - timedelta(days=1)
+            if entry_date == expected:
+                streak += 1
+                today = entry_date
+            else:
+                break
+    return streak
+
 @app.route('/')
 def index():
     page = request.args.get('page', 1, type=int)
@@ -61,7 +95,8 @@ def index():
     has_prev = page > 1
     has_next = offset + per_page < total
     now = datetime.now(tz)
-    return render_template('index.html', entries=entries, today=today, page=page, has_prev=has_prev, has_next=has_next, now=now, todays_entry=todays_entry)
+    streak = calculate_streak()
+    return render_template('index.html', entries=entries, today=today, page=page, has_prev=has_prev, has_next=has_next, now=now, todays_entry=todays_entry, streak=streak)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
@@ -193,3 +228,6 @@ def delete_entry(entry_id):
 
 init_db()
 logging.info('EchoLog started up successfully.')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port='5000')
