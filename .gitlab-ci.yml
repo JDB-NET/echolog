@@ -3,7 +3,7 @@ stages:
   - deploy
 
 variables:
-  IMAGE_NAME: "$HARBOR_REGISTRY/internal/echolog"
+  IMAGE_NAME: "$HARBOR_REGISTRY/public/echolog"
 
 buildandpush:
   stage: buildandpush
@@ -16,11 +16,6 @@ buildandpush:
     - docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME:latest
     - docker push $IMAGE_NAME:$IMAGE_TAG
     - docker push $IMAGE_NAME:latest
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $HARBOR_REGISTRY/public/echolog:$IMAGE_TAG
-    - docker tag $IMAGE_NAME:$IMAGE_TAG $HARBOR_REGISTRY/public/echolog:latest
-    - docker push $HARBOR_REGISTRY/public/echolog:$IMAGE_TAG
-    - docker push $HARBOR_REGISTRY/public/echolog:latest
-
 
 deploy:
   stage: deploy

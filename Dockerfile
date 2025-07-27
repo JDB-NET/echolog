@@ -8,8 +8,7 @@ RUN pip install -r requirements.txt \
     && rm -rf /var/lib/apt/lists/* \
     && curl -sLO https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-x64 \
     && chmod +x tailwindcss-linux-x64 \
-    && mv tailwindcss-linux-x64 tailwindcss \
-    && ./tailwindcss -i ./static/input.css -o ./static/output.css --content "./templates/*.html" --minify \
-    && rm tailwindcss
+    && ./tailwindcss-linux-x64 -i ./static/input.css -o ./static/output.css --content "./templates/*.html" --minify \
+    && rm tailwindcss-linux-x64
 EXPOSE 5000
 CMD ["gunicorn", "--workers", "2", "--bind", "0.0.0.0:5000", "app:app", "--log-level", "warning"]
