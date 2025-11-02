@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/JDB-NET/echolog/compare/v1.1.0...v1.1.1) (2025-11-02)
+
+
+### Bug Fixes
+
+* :bug: image name ([7334fb0](https://github.com/JDB-NET/echolog/commit/7334fb0ec6d077ffa1166f1b1d93194635f9454e))
+
 ## [1.1.0](https://github.com/JDB-NET/echolog/compare/v1.0.0...v1.1.0) (2025-11-02)
 
 
