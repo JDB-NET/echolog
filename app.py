@@ -6,6 +6,13 @@ from datetime import datetime, date as datedate, datetime as dt
 import mysql.connector
 from dotenv import load_dotenv
 
+# Read version from VERSION file
+try:
+    with open('VERSION', 'r') as f:
+        __version__ = f.read().strip()
+except FileNotFoundError:
+    __version__ = 'unknown'
+
 app = Flask(__name__)
 
 load_dotenv()
@@ -96,7 +103,7 @@ def index():
     has_next = offset + per_page < total
     now = datetime.now(tz)
     streak = calculate_streak()
-    return render_template('index.html', entries=entries, today=today, page=page, has_prev=has_prev, has_next=has_next, now=now, todays_entry=todays_entry, streak=streak)
+    return render_template('index.html', entries=entries, today=today, page=page, has_prev=has_prev, has_next=has_next, now=now, todays_entry=todays_entry, streak=streak, version=__version__)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
@@ -153,7 +160,7 @@ def search():
     page = 1
     has_prev = False
     has_next = False
-    return render_template('index.html', entries=entries, today=today, now=now, page=page, has_prev=has_prev, has_next=has_next)
+    return render_template('index.html', entries=entries, today=today, now=now, page=page, has_prev=has_prev, has_next=has_next, version=__version__)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
