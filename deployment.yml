@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: echolog
-          image: docker.jdbnet.co.uk/public/echolog:latest
+          image: ghcr.io/jdb-net/echolog:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
