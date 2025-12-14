@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/JDB-NET/echolog/compare/v1.1.1...v1.1.2) (2025-12-14)
+
+
+### Bug Fixes
+
+* :bug: docker image in readme ([049271b](https://github.com/JDB-NET/echolog/commit/049271baeeaba9266aeac4603dd9f9588fec4bfb))
+
 ## [1.1.1](https://github.com/JDB-NET/echolog/compare/v1.1.0...v1.1.1) (2025-11-02)
 
 
