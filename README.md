@@ -35,7 +35,7 @@ docker run -d \
   -e LOGIN_ENABLED=true \
   -e LOGIN_USERNAME=admin \
   -e LOGIN_PASSWORD=your_password \
-  docker.jdbnet.co.uk/public/echolog:latest
+  ghcr.io/jdb-net/echolog:latest
 ```
 
 ### Docker Compose
@@ -45,7 +45,7 @@ version: '3.8'
 
 services:
   echolog:
-    image: docker.jdbnet.co.uk/public/echolog:latest
+    image: ghcr.io/jdb-net/echolog:latest
     container_name: echolog
     restart: unless-stopped
     ports:
@@ -130,7 +130,7 @@ spec:
     spec:
       containers:
       - name: echolog
-        image: docker.jdbnet.co.uk/public/echolog:latest
+        image: ghcr.io/jdb-net/echolog:latest
         ports:
         - containerPort: 5000
         env:
