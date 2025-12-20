@@ -22,7 +22,7 @@ spec:
               name: "echolog"
           env:
             - name: MYSQL_HOST
-              value: "10.10.2.27"
+              value: "10.10.25.4"
             - name: MYSQL_USER
               value: "echolog"
             - name: MYSQL_PASSWORD
